@@ -188,13 +188,14 @@ try:
                                 else bsheet.loc['Current Assets', year] / (bsheet.loc['Current Liabilities', year]) for
                                 year in years[::-1]]
 
-
-
             qr_ratio_history = []
-            for year in years[::-1]:
-                inventory_values = bsheet.loc['Inventory', year]
-                if pd.isnull(inventory_values):  # Kiểm tra xem inventory_values có phải là NaN hay không
-                    inventory_values = bsheet.loc['Inventory', year - pd.DateOffset(years=1)]
+            if 'Inventory' in bsheet:
+                for year in years[::-1]:
+                    inventory_values = bsheet.loc['Inventory', year]
+                    if pd.isnull(inventory_values):  # Kiểm tra xem inventory_values có phải là NaN hay không
+                        inventory_values = bsheet.loc['Inventory', year - pd.DateOffset(years=1)]
+                else:
+                    inventory_values = 0
 
                 cr_liabilities = bsheet.loc['Current Liabilities', year]
                 cr_asset = bsheet.loc['Current Assets', year]
