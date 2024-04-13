@@ -286,7 +286,7 @@ try:
 
             # PE Ratio
             shares_outstanding = mck.info['sharesOutstanding']
-            PE_ratio = mck.info['trailingPE']
+            PE_ratio = mck.info['trailingPE'] if 'trailingPE' in mck.info else 0
 
             pe_ratio_history = []
             for year in years[::-1]:
