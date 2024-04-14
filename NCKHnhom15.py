@@ -778,8 +778,8 @@ try:
 
                     # Tạo DataFrame từ thông tin cơ bản
                     df = pd.DataFrame({
-                        'Tiêu đề': ['Address', 'City', 'Country', 'Website', 'Industry', 'Sector', 'Description'],
-                        'Thông tin': [
+                        'Title': ['Address', 'City', 'Country', 'Website', 'Industry', 'Sector', 'Description'],
+                        'Information': [
                             mck_info.get('address1', 'N/A'),
                             mck_info.get('city', 'N/A'),
                             mck_info.get('country', 'N/A'),
@@ -958,7 +958,7 @@ try:
                 with cola: 
                     st.subheader('Discount Rate for US Stocks')
                     risk_free1 = st.number_input("Risk Free Rate (%)", value=float(2.19))
-                    market_risk1 = st.number_input("Avarage Market Risk Premium (%)", value=float(3.7))
+                    market_risk1 = st.number_input("Average Market Risk Premium (%)", value=float(3.7))
                     capm1 = risk_free1 + mck.info['beta']*market_risk1
                     st.write('Discount Rate (CAPM): ' + str(round(capm1,3)) + '%')
                     bt = [0.8, 1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6]
@@ -973,7 +973,7 @@ try:
                 with colb: 
                     st.subheader('Discount Rate for VN Stocks')
                     risk_free2 = st.number_input("Risk Free Rate (%)", value=float(4.0))
-                    market_risk2 = st.number_input("Avarage Market Risk Premium (%)", value=float(7.1))
+                    market_risk2 = st.number_input("Average Market Risk Premium (%)", value=float(7.1))
                     capm2 = risk_free2 + mck.info['beta']*market_risk2
                     st.write('Discount Rate (CAPM): ' + str(round(capm2,3)) + '%')
                     dc_vn = {
@@ -1302,7 +1302,7 @@ try:
                         hide_index=True,
                     )
 
-                    st.subheader('GF Values')
+                    st.subheader('Value Ratios')
                     data_GF_Value = pd.DataFrame(
                         {
                             "STT": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
