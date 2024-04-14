@@ -188,14 +188,13 @@ try:
                                 else bsheet.loc['Current Assets', year] / (bsheet.loc['Current Liabilities', year]) for
                                 year in years[::-1]]
 
+
+
             qr_ratio_history = []
-            if 'Inventory' in bsheet:
-                for year in years[::-1]:
-                    inventory_values = bsheet.loc['Inventory', year]
-                    if pd.isnull(inventory_values):  # Kiểm tra xem inventory_values có phải là NaN hay không
-                        inventory_values = bsheet.loc['Inventory', year - pd.DateOffset(years=1)]
-                else:
-                    inventory_values = 0
+            for year in years[::-1]:
+                inventory_values = bsheet.loc['Inventory', year]
+                if pd.isnull(inventory_values):  # Kiểm tra xem inventory_values có phải là NaN hay không
+                    inventory_values = bsheet.loc['Inventory', year - pd.DateOffset(years=1)]
 
                 cr_liabilities = bsheet.loc['Current Liabilities', year]
                 cr_asset = bsheet.loc['Current Assets', year]
@@ -287,7 +286,7 @@ try:
 
             # PE Ratio
             shares_outstanding = mck.info['sharesOutstanding']
-            PE_ratio = mck.info['trailingPE'] if 'trailingPE' in mck.info else 0
+            PE_ratio = mck.info['trailingPE']
 
             pe_ratio_history = []
             for year in years[::-1]:
@@ -607,29 +606,25 @@ try:
             debt_ebitda_values = debt_ebitda_p / debt_ebitda_len
 
             # Interest Coverage
-            if 'Interest Expense' in TTM and TTM['Interest Expense'] !=0:
-                interest_coverage = TTM['Operating Income'] / TTM['Interest Expense'] 
-                interest_coverage_history = [
-                    income.loc['Operating Income', year] / (income.loc['Interest Expense', year] or 1) for year in
-                    years[::-1]]
-                interest_coverage_list = interest_coverage_history + [interest_coverage]
-                interest_coverage_rank = sorted(interest_coverage_list)
-                interest_coverage_p = interest_coverage_rank.index(interest_coverage) + 1
-                interest_coverage_len = len(interest_coverage_rank)
-                interest_coverage_values = interest_coverage_p / interest_coverage_len
-            else: 
-                interest_coverage_values = 0
-                interest_coverage = 'None'
-                interest_coverage_list = [0]
-                interest_coverage_p = 0
-                interest_coverage_len = 0
+            interest_coverage = TTM['Operating Income'] / TTM['Interest Expense'] if 'Interest Expense' in TTM else 0
+            interest_coverage_history = [
+                income.loc['Operating Income', year] / (income.loc['Interest Expense', year] or 1) for year in
+                years[::-1]]
+
+            interest_coverage_list = interest_coverage_history + [interest_coverage]
+            interest_coverage_rank = sorted(interest_coverage_list)
+            interest_coverage_p = interest_coverage_rank.index(interest_coverage) + 1
+            interest_coverage_len = len(interest_coverage_rank)
+            interest_coverage_values = interest_coverage_p / interest_coverage_len
+
             # Altman F-Score
             a = TTM_bsheet['Working Capital'] / TTM_bsheet['Total Assets']
             b = TTM_bsheet['Retained Earnings'] / TTM_bsheet['Total Assets']
             c = TTM['EBIT'] / TTM_bsheet['Total Assets']
             d = mck.info['marketCap'] / TTM_bsheet[
                 'Total Liabilities Net Minority Interest'] if 'marketCap' in mck.info else mck.basic_info['marketCap'] / \
-                                                                                           TTM_bsheet['Total Liabilities Net Minority Interest']
+                                                                                           TTM_bsheet[
+                                                                                               'Total Liabilities Net Minority Interest']
             e = TTM['Total Revenue'] / TTM_bsheet['Total Assets']
             altmanz_score = 1.2 * a + 1.4 * b + 3.3 * c + 0.6 * d + e
 
@@ -1224,7 +1219,7 @@ try:
                     )
 
                     st.subheader('Financial Strength: ' + str(financial_score) + '/' + '10')
-                    
+
                     data_financial = pd.DataFrame(
                         {
                             "STT": [1, 2, 3, 4, 5],
