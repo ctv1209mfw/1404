@@ -179,14 +179,15 @@ try:
             cr_len = len(cr_rank)
             cr_values2 = cr_ratio_p / cr_len
 
-            qr_ratio_history = []
             if 'Inventory' in TTM_bsheet:
                 qr_ratio = round(
-                ((TTM_bsheet['Current Assets'] - TTM_bsheet['Inventory']) / TTM_bsheet['Current Liabilities']),2) 
-      
+                    ((TTM_bsheet['Current Assets'] - TTM_bsheet['Inventory']) / TTM_bsheet['Current Liabilities']), 2)
+                qr_ratio_history = [(bsheet[year]['Current Assets'] - bsheet[year]['Inventory']) / bsheet[year]['Current Liabilities'] for year in
+                                    years[::-1]]
+
+                qr_ratio_history = []
                 for year in years[::-1]:
-                    qr_ratio_history = (bsheet.loc['Current Assets', year] - bsheet.loc['Inventory', year]) / (
-                    bsheet.loc['Current Liabilities', year])
+
                     inventory_values = bsheet.loc['Inventory', year]
                     if pd.isnull(inventory_values):  # Kiểm tra xem inventory_values có phải là NaN hay không
                         inventory_values = bsheet.loc['Inventory', year - pd.DateOffset(years=1)]
@@ -199,12 +200,12 @@ try:
                         qr_ratio_history.append(qr_ratio)
                     else:
                         qr_ratio_history.append(0)
-            else: 
+            else:
                 inventory_values = 0
                 qr_ratio = cr_ratio
                 qr_ratio_history = cr_ratio_history
-                  
-            qr_list = qr_ratio_history + [qr_ratio]
+                 
+            qr_list = qr_ratio_history + [qr_ratio] 
             qr_rank = sorted(qr_list)
             qr_ratio_p = qr_rank.index(qr_ratio) + 1
             qr_len = len(qr_rank)
@@ -1086,7 +1087,7 @@ try:
                     number8_str = st.text_input('Discount Rate (%):', value=formatted_discount_rate_value,
                                                 placeholder="Type a number...")
                     number8 = float(number8_str.replace(',', '').replace(' %', '')) 
-
+               
                 col7, col8 = st.columns(2)
                 with col7:
                     # Creating the first table
@@ -1119,7 +1120,8 @@ try:
                         for i in range(21)
                     ]
 
-                    discount_factors = [(1 / ((1 + table1['Discount rate'][0]) ** i)) for i in range(21)]
+                    discount_factors = [(1 / ((1 + table1['Discount rate'][0]/100) ** i)) for i in range(21)]
+               
                     discounted_values = [cf * df for cf, df in zip(cash_flows, discount_factors)]
 
                     data2 = {
