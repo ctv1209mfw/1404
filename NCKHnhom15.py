@@ -179,32 +179,31 @@ try:
             cr_len = len(cr_rank)
             cr_values2 = cr_ratio_p / cr_len
 
-            qr_ratio = round(
-                ((TTM_bsheet['Current Assets'] - TTM_bsheet['Inventory']) / TTM_bsheet['Current Liabilities']),
-                2) if 'Inventory' in TTM_bsheet else TTM_bsheet['Current Assets'] / TTM_bsheet[
-                'Current Liabilities']
-            qr_ratio_history = [(bsheet.loc['Current Assets', year] - bsheet.loc['Inventory', year]) / (
-                bsheet.loc['Current Liabilities', year]) if 'Inventory' in bsheet
-                                else bsheet.loc['Current Assets', year] / (bsheet.loc['Current Liabilities', year]) for
-                                year in years[::-1]]
-
-
-
             qr_ratio_history = []
-            for year in years[::-1]:
-                inventory_values = bsheet.loc['Inventory', year]
-                if pd.isnull(inventory_values):  # Kiểm tra xem inventory_values có phải là NaN hay không
-                    inventory_values = bsheet.loc['Inventory', year - pd.DateOffset(years=1)]
+            if 'Inventory' in TTM_bsheet:
+                qr_ratio = round(
+                ((TTM_bsheet['Current Assets'] - TTM_bsheet['Inventory']) / TTM_bsheet['Current Liabilities']),2) 
+      
+                for year in years[::-1]:
+                    qr_ratio_history = (bsheet.loc['Current Assets', year] - bsheet.loc['Inventory', year]) / (
+                    bsheet.loc['Current Liabilities', year])
+                    inventory_values = bsheet.loc['Inventory', year]
+                    if pd.isnull(inventory_values):  # Kiểm tra xem inventory_values có phải là NaN hay không
+                        inventory_values = bsheet.loc['Inventory', year - pd.DateOffset(years=1)]
 
-                cr_liabilities = bsheet.loc['Current Liabilities', year]
-                cr_asset = bsheet.loc['Current Assets', year]
+                    cr_liabilities = bsheet.loc['Current Liabilities', year]
+                    cr_asset = bsheet.loc['Current Assets', year]
 
-                if pd.notnull(cr_liabilities) and pd.notnull(cr_asset) and pd.notnull(inventory_values):
-                    qr_ratio = (cr_asset - inventory_values) / cr_liabilities
-                    qr_ratio_history.append(qr_ratio)
-                else:
-                    qr_ratio_history.append(0)
-
+                    if pd.notnull(cr_liabilities) and pd.notnull(cr_asset) and pd.notnull(inventory_values):
+                        qr_ratio = (cr_asset - inventory_values) / cr_liabilities
+                        qr_ratio_history.append(qr_ratio)
+                    else:
+                        qr_ratio_history.append(0)
+            else: 
+                inventory_values = 0
+                qr_ratio = cr_ratio
+                qr_ratio_history = cr_ratio_history
+                  
             qr_list = qr_ratio_history + [qr_ratio]
             qr_rank = sorted(qr_list)
             qr_ratio_p = qr_rank.index(qr_ratio) + 1
@@ -606,25 +605,29 @@ try:
             debt_ebitda_values = debt_ebitda_p / debt_ebitda_len
 
             # Interest Coverage
-            interest_coverage = TTM['Operating Income'] / TTM['Interest Expense'] if 'Interest Expense' in TTM else 0
-            interest_coverage_history = [
-                income.loc['Operating Income', year] / (income.loc['Interest Expense', year] or 1) for year in
-                years[::-1]]
-
-            interest_coverage_list = interest_coverage_history + [interest_coverage]
-            interest_coverage_rank = sorted(interest_coverage_list)
-            interest_coverage_p = interest_coverage_rank.index(interest_coverage) + 1
-            interest_coverage_len = len(interest_coverage_rank)
-            interest_coverage_values = interest_coverage_p / interest_coverage_len
-
+            if 'Interest Expense' in TTM and TTM['Interest Expense'] !=0:
+                interest_coverage = TTM['Operating Income'] / TTM['Interest Expense'] 
+                interest_coverage_history = [
+                    income.loc['Operating Income', year] / (income.loc['Interest Expense', year] or 1) for year in
+                    years[::-1]]
+                interest_coverage_list = interest_coverage_history + [interest_coverage]
+                interest_coverage_rank = sorted(interest_coverage_list)
+                interest_coverage_p = interest_coverage_rank.index(interest_coverage) + 1
+                interest_coverage_len = len(interest_coverage_rank)
+                interest_coverage_values = interest_coverage_p / interest_coverage_len
+            else: 
+                interest_coverage_values = 0
+                interest_coverage = 'None'
+                interest_coverage_list = [0]
+                interest_coverage_p = 0
+                interest_coverage_len = 0
             # Altman F-Score
             a = TTM_bsheet['Working Capital'] / TTM_bsheet['Total Assets']
             b = TTM_bsheet['Retained Earnings'] / TTM_bsheet['Total Assets']
             c = TTM['EBIT'] / TTM_bsheet['Total Assets']
             d = mck.info['marketCap'] / TTM_bsheet[
                 'Total Liabilities Net Minority Interest'] if 'marketCap' in mck.info else mck.basic_info['marketCap'] / \
-                                                                                           TTM_bsheet[
-                                                                                               'Total Liabilities Net Minority Interest']
+                                                                                           TTM_bsheet['Total Liabilities Net Minority Interest']
             e = TTM['Total Revenue'] / TTM_bsheet['Total Assets']
             altmanz_score = 1.2 * a + 1.4 * b + 3.3 * c + 0.6 * d + e
 
@@ -1010,19 +1013,20 @@ try:
 
                     # Nhập growth rate
                     st.subheader("Growth Rate")
-                    growth_rate1_str = st.text_input('Growth rate Y1-5', value="%")
+                    
+                    growth_rate1_str = st.text_input('Growth rate Y1-5 (Type a number)', value="%")
                     if growth_rate1_str.strip() == "%":  # Kiểm tra nếu chuỗi chỉ là ký tự '%'
                         growth_rate1 = 0.0  # Gán giá trị mặc định cho trường hợp này
                     else:
                         growth_rate1 = float(growth_rate1_str.replace(',', '').replace('%', '')) / 100
                     
-                    growth_rate2_str = st.text_input('Growth rate Y6-10', value="%")
+                    growth_rate2_str = st.text_input('Growth rate Y6-10 (Type a number)', value="%")
                     if growth_rate2_str.strip() == "%":  # Kiểm tra nếu chuỗi chỉ là ký tự '%'
                         growth_rate2 = 0.0  # Gán giá trị mặc định cho trường hợp này
                     else:
                         growth_rate2 = float(growth_rate2_str.replace(',', '').replace('%', '')) / 100
 
-                    growth_rate3_str = st.text_input('Growth rate Y11-20', value="%")
+                    growth_rate3_str = st.text_input('Growth rate Y11-20 (Type a number)', value="%")
                     if growth_rate3_str.strip() == "%":  # Kiểm tra nếu chuỗi chỉ là ký tự '%'
                         growth_rate3 = 0.0  # Gán giá trị mặc định cho trường hợp này
                     else:
@@ -1219,7 +1223,7 @@ try:
                     )
 
                     st.subheader('Financial Strength: ' + str(financial_score) + '/' + '10')
-
+                    
                     data_financial = pd.DataFrame(
                         {
                             "STT": [1, 2, 3, 4, 5],
