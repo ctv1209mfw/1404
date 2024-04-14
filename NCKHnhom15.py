@@ -1260,6 +1260,20 @@ try:
                         }
                     )
                     st.data_editor(data_score, hide_index=True)
+
+                    st.write('Conclusion: ')
+                    if altmanz_score <=1.8:
+                        st.write('1. Altman Z-Score = ' + str(round(altmanz_score,2)) + ': Distress Zone - High Likelihood of Bankruptcy')
+                    elif 1.8 < altmanz_score <3:
+                        st.write('1. Altman Z-Score = ' + str(round(altmanz_score,2)) + ':  Grey - Moderate Likelihood of Bankruptcy')
+                    else:
+                        st.write('1. Altman Z-Score = ' + str(round(altmanz_score,2)) + ': Safe Zone - Low Likelihood of Bankruptcy')
+                    
+                    if m <=-1.78:
+                        st.write('2. Beneish M-Score = ' + str(round(m,2)) + ': Unlikely to be a manipulator')
+                    else:
+                        st.write('2. Beneish M-Score = ' + str(round(m,2)) + ': Likely to be a manipulator')
+
                 with col2:
                     st.subheader('Liquidity Ratio: ' + str(liquidity_score) + '/' + '10')
                     data_liquidity = pd.DataFrame(
