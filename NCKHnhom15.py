@@ -834,14 +834,16 @@ try:
                     'Stock Based Compensation': [cfs.loc['Stock Based Compensation', year] for year in years[::-1]] + [
                         TTM_cfs['Stock Based Compensation']] if 'Stock Based Compensation' in cfs else 0,
                     'Cash Flow for Dividends': [cfs.loc['Cash Dividends Paid', year] for year in years[::-1]] + [
-                        TTM_cfs['Cash Dividends Paid']] if 'Cash Dividend Paid' in cfs else 0
+                        TTM_cfs['Cash Dividends Paid']] if 'Cash Dividend Paid' in cfs else 0,
+                    'Capital Expenditure': [cfs.loc['Capital Expenditure', year] for year in years[::-1]] + [
+                        TTM_cfs['Capital Expenditure']] if 'Capital Expenditure' in TTM_cfs else 0
                 }
 
                 dfv = pd.DataFrame(datav)
                 # Plot the chart using Plotly Express
                 # Revenue, Net Income, Operating Cash Flow
                 # create plot
-                columns_to_plot = ['Revenue', 'Net Income', 'Operating Cash Flow', 'Free Cash Flow']
+                columns_to_plot = ['Revenue', 'Net Income', 'Operating Cash Flow', 'Free Cash Flow', 'Capital Expenditure']
                 x = ['['] + dfv['Time'] + [']']
                 # Plot grouped bar chart
                 fig = px.bar(dfv, x, y=columns_to_plot, title='Financial Ratios',
@@ -1262,9 +1264,9 @@ try:
                     st.data_editor(data_score, hide_index=True)
 
                     st.write('Conclusion: ')
-                    if altmanz_score <=1.8:
+                    if altmanz_score <=1.81:
                         st.write('1. Altman Z-Score = ' + str(round(altmanz_score,2)) + ': Distress Zone - High Likelihood of Bankruptcy')
-                    elif 1.8 < altmanz_score <3:
+                    elif 1.81 < altmanz_score <2.99:
                         st.write('1. Altman Z-Score = ' + str(round(altmanz_score,2)) + ':  Grey - Moderate Likelihood of Bankruptcy')
                     else:
                         st.write('1. Altman Z-Score = ' + str(round(altmanz_score,2)) + ': Safe Zone - Low Likelihood of Bankruptcy')
