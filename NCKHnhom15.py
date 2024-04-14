@@ -1302,7 +1302,7 @@ try:
                         hide_index=True,
                     )
 
-                    st.subheader('Value Ratios')
+                    st.subheader('Value Ratio')
                     data_GF_Value = pd.DataFrame(
                         {
                             "STT": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
