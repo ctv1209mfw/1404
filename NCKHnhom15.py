@@ -211,9 +211,9 @@ try:
             qr_len = len(qr_rank)
             qr_values = qr_ratio_p / qr_len
 
-            car_ratio = round((TTM_bsheet['Cash, Cash Equivalents & Short Term Investments'] / TTM_bsheet['Current Liabilities']), 2)
+            car_ratio = round((TTM_bsheet['Cash Cash Equivalents And Short Term Investments'] / TTM_bsheet['Current Liabilities']), 2)
             car_ratio_history = [
-                bsheet.loc['Cash, Cash Equivalents & Short Term Investments', year] / (bsheet.loc['Current Liabilities', year] or 1) for year
+                bsheet.loc['Cash Cash Equivalents And Short Term Investments', year] / (bsheet.loc['Current Liabilities', year] or 1) for year
                 in
                 years[::-1]]
 
